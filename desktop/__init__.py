@@ -266,7 +266,26 @@ def open(url, desktop=None, wait=0):
         cmd = ["exo-open", url]
 
     elif desktop_in_use == "Mac OS X":
-        cmd = ["open", url]
+        url = "file://" + url
+        # print "Markdown Preview: try open" + url
+        browser_name = "Google Chrome"
+        import appscript
+        app = appscript.app(browser_name)
+        current_window = app.windows[0]
+        current_tab = current_window.active_tab
+
+        if current_tab.URL.get() == url:
+            current_tab.reload()
+        else:
+            tab = app.windows[0].make(
+                new=appscript.k.tab,
+                with_properties={appscript.k.URL: url}
+                )
+            tab.reload()
+
+        return 0
+            # except Exception, e:
+                # cmd = ["open", url]
 
     elif desktop_in_use == "X11" and os.environ.has_key("BROWSER"):
         cmd = [os.environ["BROWSER"], url]
